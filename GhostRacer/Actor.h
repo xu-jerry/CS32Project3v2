@@ -29,6 +29,9 @@ public:
 
       // Set this actor's vertical speed.
     void setVerticalSpeed(double speed);
+    
+    // get which lane it is in (left = 0, middle = 1, right = 2)
+    int getLane();
 
       // If this actor is affected by holy water projectiles, then inflict that
       // affect on it and return true; otherwise, return false.

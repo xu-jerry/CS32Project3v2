@@ -37,6 +37,19 @@ void Actor::setVerticalSpeed(double speed) {
     m_v_speed = speed;
 }
 
+int Actor::getLane() {
+    if (getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
+        return 0;
+    }
+    else if (getX() >= ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3 && getX() < ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3) {
+        return 1;
+    }
+    else if (getX() >= ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3 && getX() < ROAD_CENTER + ROAD_WIDTH / 2) {
+        return 2;
+    }
+    return -1;
+}
+
 // If this actor is affected by holy water projectiles, then inflict that
 // affect on it and return true; otherwise, return false.
 bool Actor::beSprayedIfAppropriate() {
@@ -53,9 +66,11 @@ bool Actor::isCollisionAvoidanceWorthy() const {
 // vertical speed.  Return true if the new position is within the view;
 // otherwise, return false, with the actor dead.
 bool Actor::moveRelativeToGhostRacerVerticalSpeed(double dx) {
+    
     moveTo(getX() + dx, getY() + getVerticalSpeed() - world()->getGhostRacer()->getVerticalSpeed());
     if (getX() < 0 || getY() < 0 || getX() > VIEW_WIDTH || getY() >
         VIEW_HEIGHT) {
+        setDead();
         return false;
     }
     return true;
@@ -224,14 +239,7 @@ void Pedestrian::setHorizSpeed(int s) {
 // Move the pedestrian.  If the pedestrian doesn't go off screen and
 // should pick a new movement plan, pick a new plan.
 void Pedestrian::moveAndPossiblyPickPlan() {
-    int vert_speed = getVerticalSpeed() - world()->getGhostRacer()->getVerticalSpeed();
-    int horiz_speed = m_h_speed;
-    int new_y = getY() + vert_speed;
-    int new_x = getX() + horiz_speed;
-    moveTo(new_x, new_y);
-    if (getX() < 0 || getY() < 0 || getX() > VIEW_WIDTH || getY() >
-        VIEW_HEIGHT) {
-        setDead();
+    if (!moveRelativeToGhostRacerVerticalSpeed(m_h_speed)) {
         return;
     }
     m_plan_distance--;
@@ -304,8 +312,89 @@ ZombieCab::ZombieCab(StudentWorld* sw, double x, double y): Agent(sw, IID_ZOMBIE
     m_has_damaged_ghost_racer = false;
 }
 void ZombieCab::doSomething() {
-
+    if (isDead()) {
+        return;
+    }
+    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+        if (!m_has_damaged_ghost_racer) {
+            world()->playSound(SOUND_VEHICLE_CRASH);
+            world()->getGhostRacer()->takeDamageAndPossiblyDie(20);
+            if (getX() <= world()->getGhostRacer()->getX()) {
+                m_h_speed = -5;
+                setDirection(120 + randInt(0, 19));
+            }
+            else {
+                m_h_speed = 5;
+                setDirection(60 - randInt(0, 19));
+            }
+            m_has_damaged_ghost_racer = true;
+        }
+    }
+    if (!moveRelativeToGhostRacerVerticalSpeed(m_h_speed)) {
+        return;
+    }
+    if (getVerticalSpeed() > world()->getGhostRacer()->getVerticalSpeed()) {
+        double min_dist_to_actor = -1;
+        for (int i = 0; i < world()->getActors().size(); i++) {
+            Actor* cur_actor = world()->getActors()[i];
+            if (cur_actor->isCollisionAvoidanceWorthy() && getLane() == cur_actor->getLane()) {
+                if (getY() < cur_actor->getY()) {
+                    if (min_dist_to_actor == -1) {
+                        min_dist_to_actor = cur_actor->getY() - getY();
+                    }
+                    else {
+                        min_dist_to_actor = min(min_dist_to_actor, cur_actor->getY() - getY());
+                    }
+                }
+            }
+        }
+        if (min_dist_to_actor != -1 && min_dist_to_actor < 96) {
+            setVerticalSpeed(getVerticalSpeed() - 0.5);
+            return;
+        }
+    }
+    else {
+        double min_dist_to_actor = VIEW_HEIGHT + 1;
+        for (int i = 0; i < world()->getActors().size(); i++) {
+            Actor* cur_actor = world()->getActors()[i];
+            if (cur_actor->isCollisionAvoidanceWorthy() && getLane() == cur_actor->getLane()) {
+                if (getY() > cur_actor->getY()) {
+                    if (min_dist_to_actor == VIEW_HEIGHT + 1) {
+                        min_dist_to_actor = getY() - cur_actor->getY();
+                    }
+                    else {
+                        min_dist_to_actor = min(min_dist_to_actor, getY() - cur_actor->getY());
+                    }
+                }
+            }
+        }
+        if (min_dist_to_actor != VIEW_HEIGHT + 1 && min_dist_to_actor < 96) {
+            setVerticalSpeed(getVerticalSpeed() + 0.5);
+            return;
+        }
+    }
+    m_plan_distance--;
+    if (m_plan_distance > 0) {
+        return;
+    }
+    m_plan_distance = randInt(4, 32);
+    setVerticalSpeed(getVerticalSpeed() + randInt(-2, 2));
+    /*
+     4. If the
+     the cab is moving up the screen) and there is a "collision-avoidance worthy" actor in the zombie cab's lane that is in front of that zombie cab:
+     zombie cab’s vertical speed is greater than Ghost Racer’s vertical speed (so
+     a. If the closest such actor is less than 96 vertical pixels in front of the zombie cab, decrease the zombie cab's vertical speed by .5 and immediately return.
+     5. If the zombie cab's vertical speed is the same as or slower than Ghost Racer's vertical speed (so the cab is moving down the screen or holding steady with Ghost Racer) and there is a "collision-avoidance worthy" actor in the zombie cab's lane that is behind that zombie cab:
+     a. If the closest such actor is less than 96 vertical pixels behind the zombie cab and is not Ghost Racer, increase the zombie cab's vertical speed by .5 and immediately return.
+     6. Decrement the zombie cab’s movement plan distance by one.
+     7. If the zombie cab’s movement plan distance is greater than zero, then
+     immediately return.
+     8. Otherwise, it’s time to pick a new movement plan for the zombie cab:
+     a. Set the zombie cab’s movement plan distance to a random integer between 4 and 32, inclusive.
+     b. Set the zombie cab’s vertical speed to its vertical speed + a random integer between -2 and 2, inclusive.
+     */
 }
+
 bool ZombieCab::beSprayedIfAppropriate() {
     return false;
 }

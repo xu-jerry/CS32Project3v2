@@ -119,6 +119,9 @@ int StudentWorld::move()
             int col_num = randInt(0, columns.size() - 1);
             int cur_lane = columns[col_num];
             double min_y = -1;
+            if (m_ghost_racer->getLane() == cur_lane) {
+                min_y = m_ghost_racer->getY();
+            }
             for (int j = 0; j < m_actors.size(); j++) {
                 bool in_lane = false;
                 switch (cur_lane) {
@@ -154,9 +157,13 @@ int StudentWorld::move()
                 break;
             }
             double max_y = VIEW_HEIGHT + 1;
+            if (m_ghost_racer->getLane() == cur_lane) {
+                max_y = m_ghost_racer->getY();
+            }
             for (int j = 0; j < m_actors.size(); j++) {
                 bool in_lane = false;
                 switch (cur_lane) {
+                        // change later
                     case 0:
                         if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && m_actors[j]->getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
                             in_lane = true;
@@ -204,40 +211,10 @@ int StudentWorld::move()
                     break;
             }
             ZombieCab* tempcab = new ZombieCab(this, start_x, start_y);
+            tempcab->setVerticalSpeed(v_speed);
             m_actors.push_back(tempcab);
         }
     }
-    /*
-     Determining a Starting Position and Initial Movement Plan of a Zombie Cab
-     You must use the following algorithm to determine the starting location and initial vertical speed of a zombie cab, and for that matter, whether it should ultimately be added during the current tick:
-     1. Let cur_lane = a random candidate lane to start evaluating (left, middle, or right, chosen with equal probability) in which to start our new zombie cab.
-     2. Repeat the following up to three times (once for each lane):
-     a. Determine the closest “collision avoidance-worthy actor” to the BOTTOM
-     of the screen in candidate lane3. A collision avoidance-worthy actor is a
-     pedestrian or vehicle of any type.
-     b. If there is no such actor in the candidate lane, or there is such an actor and
-     it has a Y coordinate that is greater than (VIEW_HEIGHT / 3) then:
-     i. cur_lane is the chosen lane for the new vehicle
-     ii. The start Y coordinate for this new vehicle will be SPRITE_HEIGHT / 2
-     3 For this project, an actor is considered to be in a particular lane K if the center of the actor is on or to the right of the left boundary of lane K, and to the left of (but not on) the right boundary of lane K.
-       22
-     iii. The initial vertical speed of the new vehicle will be the Ghost Racer’s vertical speed PLUS a random integer between 2 and 4 inclusive.
-     iv. Break out of the loop and proceed to step 3
-     c. Determine the closest “collision avoidance-worthy actor” to the TOP of
-     the screen in the candidate lane
-     d. If there is no such actor in the candidate lane, or there is such an actor and
-     it has a Y coordinate that is less than (VIEW_HEIGHT * 2 / 3) then:
-     i. cur_lane is the chosen lane for the new vehicle
-     ii. The start Y coordinate for this new vehicle will be VIEW_HEIGHT - SPRITE_HEIGHT / 2
-     iii. The initial vertical speed of the new vehicle will be the Ghost Racer’s vertical speed MINUS a random integer between 2 and 4 inclusive.
-     iv. Break out of the loop and proceed to step 3
-     e. Otherwise, the current lane is too dangerous to add a new zombie cab (it
-     would probably quickly result in a collision with Ghost Racer or some other actor that should be avoided), so set cur_lane to the next of the three lanes to check (you may check the three lanes in any order, so long as you check each lane just once)
-     3. If no viable lane was identified as the “chosen lane” to introduce our new zombie cab (because there are too many cabs/peds in every lane already), then we will not introduce a zombie cab during this tick. You can simply avoid adding a cab during this tick.
-     4. Otherwise, it means we found a lane and a position (top or bottom of the lane) to safely add a new zombie cab.
-     5. The start X coordinate for this new vehicle is the center of the chosen lane, which will be at ROAD_CENTER for the middle lane, or ROAD_CENTER - ROAD_WIDTH/3 for the left lane, or ROAD_CENTER + ROAD_WIDTH/3 for the right lane.
-     6. Create your new zombie cab with the appropriate starting x, y and vertical speed components computed above.
-     */
    
    // add new human pedestrians
    int ChanceHumanPed = max(200 - getLevel() * 10, 30);
@@ -300,6 +277,10 @@ StudentWorld::~StudentWorld() {
 
 GhostRacer* StudentWorld::getGhostRacer() {
     return m_ghost_racer;
+}
+
+std::vector<Actor*> StudentWorld::getActors() {
+    return m_actors;
 }
 
   // Add an actor to the world.
