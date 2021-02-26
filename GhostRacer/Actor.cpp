@@ -45,7 +45,7 @@ bool Actor::beSprayedIfAppropriate() {
 
 // Does this object affect zombie cab placement and speed?
 bool Actor::isCollisionAvoidanceWorthy() const {
-    return true;
+    return false;
 }
 
 // Adjust the x coordinate by dx to move to a position with a y coordinate
@@ -68,10 +68,6 @@ BorderLine::BorderLine(StudentWorld* sw, double x, double y, bool isYellow): Act
 }
 void BorderLine::doSomething() {
     moveRelativeToGhostRacerVerticalSpeed(0);
-}
-
-bool BorderLine::isCollisionAvoidanceWorthy() const {
-    return false;
 }
 
 Agent::Agent(StudentWorld* sw, int imageID, double x, double y, double size, int dir, int hp): Actor(sw, imageID, x, y, size, dir, 0){

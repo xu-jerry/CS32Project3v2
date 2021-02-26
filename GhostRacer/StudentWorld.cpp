@@ -108,41 +108,103 @@ int StudentWorld::move()
    
     
     int ChanceVehicle = max(100 - getLevel() * 10, 20);
+    //int ChanceVehicle = 5;
     int ChanceVehicle1 =  randInt(0, ChanceVehicle - 1);
     if (ChanceVehicle1 == 0) {
-        bool found_lane = false;
-        int cur_lane = randInt(0, 2);
-        double start_y;
+        int found_lane = -1;
+        double start_y = -1;
         double v_speed;
+        vector<int> columns = {0, 1, 2};
         for (int i = 0; i < 3; i++) {
+            int col_num = randInt(0, columns.size() - 1);
+            int cur_lane = columns[col_num];
             double min_y = -1;
             for (int j = 0; j < m_actors.size(); j++) {
-                if (m_actors[i]->isCollisionAvoidanceWorthy()) {
+                bool in_lane = false;
+                switch (cur_lane) {
+                    case 0:
+                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && m_actors[j]->getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
+                            in_lane = true;
+                        }
+                        break;
+                    case 1:
+                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3) {
+                            in_lane = true;
+                        }
+                        break;
+                    default:
+                        if (m_actors[j]->getX() >= ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2) {
+                            in_lane = true;
+                        }
+                        break;
+                }
+                if (m_actors[j]->isCollisionAvoidanceWorthy() && in_lane) {
                     if (min_y == -1) {
-                        min_y = m_actors[i]->getY();
+                        min_y = m_actors[j]->getY();
                     }
                     else {
-                        min_y = min(min_y, m_actors[i]->getY());
+                        min_y = min(min_y, m_actors[j]->getY());
                     }
                 }
             }
             if (min_y == -1 || min_y > VIEW_HEIGHT / 3) {
-                found_lane = true;
+                found_lane = cur_lane;
                 start_y = SPRITE_HEIGHT / 2;
                 v_speed = m_ghost_racer->getVerticalSpeed() + randInt(2, 4);
                 break;
             }
             double max_y = VIEW_HEIGHT + 1;
             for (int j = 0; j < m_actors.size(); j++) {
-                if (m_actors[i]->isCollisionAvoidanceWorthy()) {
+                bool in_lane = false;
+                switch (cur_lane) {
+                    case 0:
+                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && m_actors[j]->getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
+                            in_lane = true;
+                        }
+                        break;
+                    case 1:
+                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3) {
+                            in_lane = true;
+                        }
+                        break;
+                    default:
+                        if (m_actors[j]->getX() >= ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2) {
+                            in_lane = true;
+                        }
+                        break;
+                }
+                if (m_actors[j]->isCollisionAvoidanceWorthy() && in_lane) {
                     if (max_y == VIEW_HEIGHT + 1) {
-                        max_y = m_actors[i]->getY();
+                        max_y = m_actors[j]->getY();
                     }
                     else {
-                        max_y = max(max_y, m_actors[i]->getY());
+                        max_y = max(max_y, m_actors[j]->getY());
                     }
                 }
             }
+            if (max_y == VIEW_HEIGHT + 1 || max_y < VIEW_HEIGHT * 2 / 3) {
+                found_lane = cur_lane;
+                start_y = VIEW_HEIGHT - SPRITE_HEIGHT / 2;
+                v_speed = m_ghost_racer->getVerticalSpeed() - randInt(2, 4);
+                break;
+            }
+            columns.erase(columns.begin() + col_num);
+        }
+        if (found_lane != -1) {
+            double start_x;
+            switch (found_lane) {
+                case 0:
+                    start_x = ROAD_CENTER - ROAD_WIDTH / 3;
+                    break;
+                case 1:
+                    start_x = ROAD_CENTER;
+                    break;
+                default:
+                    start_x = ROAD_CENTER + ROAD_WIDTH / 3;
+                    break;
+            }
+            ZombieCab* tempcab = new ZombieCab(this, start_x, start_y);
+            m_actors.push_back(tempcab);
         }
     }
     /*

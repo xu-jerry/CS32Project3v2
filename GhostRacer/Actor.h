@@ -53,7 +53,6 @@ class BorderLine : public Actor
 public:
     BorderLine(StudentWorld* sw, double x, double y, bool isYellow);
     virtual void doSomething();
-    virtual bool isCollisionAvoidanceWorthy() const;
 private:
     bool m_is_yellow;
 };
