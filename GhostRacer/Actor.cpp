@@ -4,32 +4,35 @@
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 
 Actor::Actor(StudentWorld* sw, int imageID, double x, double y, double size, int dir, int depth): GraphObject(imageID, x, y, dir, size, depth) {
-
+    m_student_world = sw;
+    m_alive = true;
+    m_v_speed = 0;
+    
 }
 
 // Is this actor dead?
 bool Actor::isDead() const {
-    return false;
+    return !m_alive;
 }
 
 // Mark this actor as dead.
 void Actor::setDead() {
-
+    m_alive = false;
 }
 
 // Get this actor's world
 StudentWorld* Actor::world() const {
-    return nullptr;
+    return m_student_world;
 }
 
 // Get this actor's vertical speed.
 double Actor::getVerticalSpeed() const {
-    return 0;
+    return m_v_speed;
 }
 
 // Set this actor's vertical speed.
 void Actor::setVerticalSpeed(double speed) {
-
+    m_v_speed = speed;
 }
 
 // If this actor is affected by holy water projectiles, then inflict that
@@ -48,32 +51,40 @@ bool Actor::isCollisionAvoidanceWorthy() const {
 // vertical speed.  Return true if the new position is within the view;
 // otherwise, return false, with the actor dead.
 bool Actor::moveRelativeToGhostRacerVerticalSpeed(double dx) {
-    return false;
+    moveTo(getX() + dx, getY() + getVerticalSpeed() - world()->getGhostRacer()->getVerticalSpeed());
+    if (getX() < 0 || getY() < 0 || getX() > VIEW_WIDTH || getY() >
+        VIEW_HEIGHT) {
+        return false;
+    }
+    return true;
 }
 
 BorderLine::BorderLine(StudentWorld* sw, double x, double y, bool isYellow): Actor(sw, isYellow? IID_YELLOW_BORDER_LINE: IID_WHITE_BORDER_LINE, x, y, 2.0, 0, 2){
+    setVerticalSpeed(-4);
+    isYellow? m_is_yellow = true: m_is_yellow = false;
     
 }
 void BorderLine::doSomething() {
-    
+    moveRelativeToGhostRacerVerticalSpeed(0);
 }
 
 Agent::Agent(StudentWorld* sw, int imageID, double x, double y, double size, int dir, int hp): Actor(sw, imageID, x, y, size, dir, 0){
+    m_hp = hp;
 
 }
 
 bool Agent::isCollisionAvoidanceWorthy() const {
-    return false;
+    return true;
 }
 
 // Get hit points.
 int Agent::getHP() const {
-    return 0;
+    return m_hp;
 }
 
 // Increase hit points by hp.
-void Agent::getHP(int hp) const {
-
+void Agent::incHP(int hp) {
+    m_hp += hp;
 }
 
 // Do what the spec says happens when hp units of damage is inflicted.
@@ -93,7 +104,7 @@ int Agent::soundWhenDie() {
 }
 
 GhostRacer::GhostRacer(StudentWorld* sw, double x, double y): Agent(sw, IID_GHOST_RACER, x, y, 4.0, 90, 100){
-
+    m_num_sprays = 10;
 }
 
 void GhostRacer::doSomething() {
@@ -106,12 +117,12 @@ int GhostRacer::soundWhenDie() const {
 
 // How many holy water projectiles does the object have?
 int GhostRacer::getNumSprays() const {
-    return 0;
+    return m_num_sprays;
 }
 
 // Increase the number of holy water projectiles the object has.
 void GhostRacer::increaseSprays(int amt) {
-
+    m_num_sprays += amt;
 }
 
 // Spin as a result of hitting an oil slick.

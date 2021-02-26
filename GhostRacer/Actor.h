@@ -42,7 +42,10 @@ public:
       // vertical speed.  Return true if the new position is within the view;
       // otherwise, return false, with the actor dead.
     virtual bool moveRelativeToGhostRacerVerticalSpeed(double dx);
-
+private:
+    bool m_alive;
+    StudentWorld* m_student_world;
+    int m_v_speed;
 };
 
 class BorderLine : public Actor
@@ -50,6 +53,8 @@ class BorderLine : public Actor
 public:
     BorderLine(StudentWorld* sw, double x, double y, bool isYellow);
     virtual void doSomething();
+private:
+    bool m_is_yellow;
 };
 
 class Agent : public Actor
@@ -62,7 +67,7 @@ public:
     int getHP() const;
 
       // Increase hit points by hp.
-    void getHP(int hp) const;
+    void incHP(int hp);
 
       // Do what the spec says happens when hp units of damage is inflicted.
       // Return true if this agent dies as a result, otherwise false.
@@ -73,6 +78,8 @@ public:
 
       // What sound should play when this agent is damaged and dies?
     virtual int soundWhenDie();
+private:
+    int m_hp;
 };
 
 class GhostRacer : public Agent
@@ -90,6 +97,8 @@ public:
 
       // Spin as a result of hitting an oil slick.
     void spin();
+private:
+    int m_num_sprays;
 };
 
 class Pedestrian : public Agent

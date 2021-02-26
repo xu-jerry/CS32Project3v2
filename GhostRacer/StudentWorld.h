@@ -39,6 +39,12 @@ public:
       // If actor a overlaps this world's GhostRacer, return a pointer to the
       // GhostRacer; otherwise, return nullptr
     GhostRacer* getOverlappingGhostRacer(Actor* a) const;
+private:
+    GhostRacer* m_ghost_racer;
+    std::vector<Actor*> m_actors;
+    double m_last_white_border_y;
+    int m_bonus;
+    int m_souls2save;
 };
 
 #endif // STUDENTWORLD_H_
