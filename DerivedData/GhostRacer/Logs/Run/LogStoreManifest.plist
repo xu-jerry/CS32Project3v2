@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>10</integer>
+	<key>logs</key>
+	<dict>
+		<key>19228B93-7C13-4836-9C8E-AB1E4E2247C8</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>19228B93-7C13-4836-9C8E-AB1E4E2247C8.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636010679.05736399</real>
+			<key>timeStoppedRecording</key>
+			<real>636010687.91054404</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>19228B93-7C13-4836-9C8E-AB1E4E2247C8</string>
+		</dict>
+		<key>73FCC13E-A3D0-4C16-940E-4500B68A61DB</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>73FCC13E-A3D0-4C16-940E-4500B68A61DB.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636010839.60418797</real>
+			<key>timeStoppedRecording</key>
+			<real>636010855.75538099</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>73FCC13E-A3D0-4C16-940E-4500B68A61DB</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

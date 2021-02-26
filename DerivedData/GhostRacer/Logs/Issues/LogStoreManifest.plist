@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>10</integer>
+	<key>logs</key>
+	<dict>
+		<key>5E62C214-8C40-4DE3-87B0-A76298D00587</key>
+		<dict>
+			<key>className</key>
+			<string>IDEActivityLogMajorGroupSection</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.target.product-type.tool</string>
+			<key>fileName</key>
+			<string>5E62C214-8C40-4DE3-87B0-A76298D00587.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+			</dict>
+			<key>signature</key>
+			<string>GhostRacer-eckuupieylywgcdswuvctsnfugwx</string>
+			<key>timeStartedRecording</key>
+			<real>636010677.62336802</real>
+			<key>timeStoppedRecording</key>
+			<real>636010679.04889798</real>
+			<key>title</key>
+			<string>Build target GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>5E62C214-8C40-4DE3-87B0-A76298D00587</string>
+		</dict>
+		<key>D5B1663E-A63C-47E6-9A76-134C8F773A5B</key>
+		<dict>
+			<key>className</key>
+			<string>IDEActivityLogMajorGroupSection</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.target.product-type.tool</string>
+			<key>fileName</key>
+			<string>D5B1663E-A63C-47E6-9A76-134C8F773A5B.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+			</dict>
+			<key>signature</key>
+			<string>GhostRacer-acfcizphplwwmkdkygttvtgursnc</string>
+			<key>timeStartedRecording</key>
+			<real>636011537.78675604</real>
+			<key>timeStoppedRecording</key>
+			<real>636011538.55397701</real>
+			<key>title</key>
+			<string>Build target GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>D5B1663E-A63C-47E6-9A76-134C8F773A5B</string>
+		</dict>
+	</dict>
+	<key>preserveOldLogs</key>
+	<true/>
+</dict>
+</plist>
