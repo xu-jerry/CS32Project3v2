@@ -166,12 +166,16 @@ void GhostRacer::doSomething() {
                     setDirection(getDirection() - 8);
                 }
             break;
-                    /*
             case KEY_PRESS_SPACE:
-            ... add spray in front of Ghost Racer...;
+                if (m_num_sprays > 0) {
+                    double delta_x = SPRITE_HEIGHT * cos(getDirection() * PI / 180);
+                    double delta_y = SPRITE_HEIGHT * sin(getDirection() * PI / 180);
+                    Actor* temp_spray = new Spray(world(), getX() + delta_x, getY() + delta_y, getDirection());
+                    world()->addActor(temp_spray);
+                    world()->playSound(SOUND_PLAYER_SPRAY);
+                    m_num_sprays--;
+                }
             break;
-            // etc…
-                     */
             case KEY_PRESS_UP:
                 if (getVerticalSpeed() < 5) {
                     setVerticalSpeed(getVerticalSpeed() + 1);
@@ -275,7 +279,10 @@ void HumanPedestrian::doSomething() {
     moveAndPossiblyPickPlan();
 }
 bool HumanPedestrian::beSprayedIfAppropriate() {
-    return false;
+    setHorizSpeed(getHorizSpeed() * -1);
+    setDirection(180 - getDirection());
+    world()->playSound(SOUND_PED_HURT);
+    return true;
 
 }
 bool HumanPedestrian::takeDamageAndPossiblyDie(int hp) {
@@ -303,7 +310,10 @@ void ZombiePedestrian::doSomething() {
     moveAndPossiblyPickPlan();
 }
 bool ZombiePedestrian::beSprayedIfAppropriate() {
-    return false;
+    if (takeDamageAndPossiblyDie(1)) {
+        // leave something
+    }
+    return true;
 }
 
 ZombieCab::ZombieCab(StudentWorld* sw, double x, double y): Agent(sw, IID_ZOMBIE_CAB, x, y, 4.0, 90, 3){
@@ -337,6 +347,9 @@ void ZombieCab::doSomething() {
         double min_dist_to_actor = -1;
         for (int i = 0; i < world()->getActors().size(); i++) {
             Actor* cur_actor = world()->getActors()[i];
+            if (cur_actor == this) {
+                continue;
+            }
             if (cur_actor->isCollisionAvoidanceWorthy() && getLane() == cur_actor->getLane()) {
                 if (getY() < cur_actor->getY()) {
                     if (min_dist_to_actor == -1) {
@@ -357,6 +370,9 @@ void ZombieCab::doSomething() {
         double min_dist_to_actor = VIEW_HEIGHT + 1;
         for (int i = 0; i < world()->getActors().size(); i++) {
             Actor* cur_actor = world()->getActors()[i];
+            if (cur_actor == this) {
+                continue;
+            }
             if (cur_actor->isCollisionAvoidanceWorthy() && getLane() == cur_actor->getLane()) {
                 if (getY() > cur_actor->getY()) {
                     if (min_dist_to_actor == VIEW_HEIGHT + 1) {
@@ -379,48 +395,58 @@ void ZombieCab::doSomething() {
     }
     m_plan_distance = randInt(4, 32);
     setVerticalSpeed(getVerticalSpeed() + randInt(-2, 2));
-    /*
-     4. If the
-     the cab is moving up the screen) and there is a "collision-avoidance worthy" actor in the zombie cab's lane that is in front of that zombie cab:
-     zombie cab’s vertical speed is greater than Ghost Racer’s vertical speed (so
-     a. If the closest such actor is less than 96 vertical pixels in front of the zombie cab, decrease the zombie cab's vertical speed by .5 and immediately return.
-     5. If the zombie cab's vertical speed is the same as or slower than Ghost Racer's vertical speed (so the cab is moving down the screen or holding steady with Ghost Racer) and there is a "collision-avoidance worthy" actor in the zombie cab's lane that is behind that zombie cab:
-     a. If the closest such actor is less than 96 vertical pixels behind the zombie cab and is not Ghost Racer, increase the zombie cab's vertical speed by .5 and immediately return.
-     6. Decrement the zombie cab’s movement plan distance by one.
-     7. If the zombie cab’s movement plan distance is greater than zero, then
-     immediately return.
-     8. Otherwise, it’s time to pick a new movement plan for the zombie cab:
-     a. Set the zombie cab’s movement plan distance to a random integer between 4 and 32, inclusive.
-     b. Set the zombie cab’s vertical speed to its vertical speed + a random integer between -2 and 2, inclusive.
-     */
 }
 
 bool ZombieCab::beSprayedIfAppropriate() {
-    return false;
+    if(takeDamageAndPossiblyDie(1)) {
+        // leave oil
+    }
+    return true;
 }
-/*
-Spray::Spray(StudentWorld* sw, double x, double y, int dir) {
 
+Spray::Spray(StudentWorld* sw, double x, double y, int dir): Actor(sw, IID_HOLY_WATER_PROJECTILE, x, y, 1.0, dir, 1) {
+    m_travel_dist = 160;
+    setVerticalSpeed(SPRITE_HEIGHT);
 }
+
 void Spray::doSomething() {
-
+    if (isDead()) {
+        return;
+    }
+    for (int i = 0; i < world()->getActors().size(); i++) {
+        Actor* cur_actor = world()->getActors()[i];
+        if (world()->overlaps(this, cur_actor)) {
+            if (cur_actor->beSprayedIfAppropriate()) {
+                // decrease health of other?
+                setDead();
+                return;
+            }
+        }
+    }
+    moveForward(SPRITE_HEIGHT);
+    m_travel_dist -= SPRITE_HEIGHT;
+    if (m_travel_dist <= 0) {
+        setDead();
+    }
 }
 
 
-GhostRacerActivatedObject::GhostRacerActivatedObject(StudentWorld* sw, int imageID, double x, double y, double size, int dir) {
+GhostRacerActivatedObject::GhostRacerActivatedObject(StudentWorld* sw, int imageID, double x, double y, double size, int dir) :Actor(sw, imageID, x, y, size, dir, 2) {
 
 }
 bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
-
+    //possible implement
+    return false;
 }
 
 // Return the sound to be played when the object is activated.
 int GhostRacerActivatedObject::getSound() const {
-
+    // implement
+    return 0;
 }
 
 
-OilSlick::OilSlick(StudentWorld* sw, double x, double y) {
+OilSlick::OilSlick(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_OIL_SLICK, x, y, randInt(2, 5), 0){
 
 }
 void OilSlick::doSomething() {
@@ -430,19 +456,23 @@ void OilSlick::doActivity(GhostRacer* gr) {
 
 }
 int OilSlick::getScoreIncrease() const {
-
+    // implement
+    return 0;
 }
 int OilSlick::getSound() const {
-
+    return SOUND_OIL_SLICK;
 }
+
 bool OilSlick::selfDestructs() const {
-
+    // implement
+    return false;
 }
+
 bool OilSlick::isSprayable() const {
-
+    return false;
 }
 
-HealingGoodie::HealingGoodie(StudentWorld* sw, double x, double y) {
+HealingGoodie::HealingGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_HEAL_GOODIE, x, y, 1.0, 0) {
 
 }
 void HealingGoodie::doSomething() {
@@ -452,53 +482,73 @@ void HealingGoodie::doActivity(GhostRacer* gr) {
 
 }
 int HealingGoodie::getScoreIncrease() const {
-
+    // implement
+    return 0;
 }
 bool HealingGoodie::selfDestructs() const {
+    //implement
+    return false;
 
 }
 bool HealingGoodie::isSprayable() const {
-
+    return true;
 }
 
 
-HolyWaterGoodie::HolyWaterGoodie(StudentWorld* sw, double x, double y) {
+HolyWaterGoodie::HolyWaterGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_HOLY_WATER_GOODIE, x, y, 2.0, 90){
 
 }
+
 void HolyWaterGoodie::doSomething() {
 
 }
+
 void HolyWaterGoodie::doActivity(GhostRacer* gr) {
 
 }
+
 int HolyWaterGoodie::getScoreIncrease() const {
+    //implement
+    return 0;
 
 }
+
 bool HolyWaterGoodie::selfDestructs() const {
-
+    // implement
+    return false;
 }
+
 bool HolyWaterGoodie::isSprayable() const {
+    return true;
+}
+
+SoulGoodie::SoulGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_SOUL_GOODIE, x, y, 4.0, 0){
 
 }
-SoulGoodie::SoulGoodie(StudentWorld* sw, double x, double y) {
 
-}
 void SoulGoodie::doSomething() {
 
 }
+
 void SoulGoodie::doActivity(GhostRacer* gr) {
 
 }
+
 int SoulGoodie::getScoreIncrease() const {
-
+    //implement
+    return 0;
 }
+
 int SoulGoodie::getSound() const {
-
+    return SOUND_GOT_SOUL;
 }
+
 bool SoulGoodie::selfDestructs() const {
-
+    // implement
+    return false;
 }
+
 bool SoulGoodie::isSprayable() const {
-
+    return false;
 }
-*/
+

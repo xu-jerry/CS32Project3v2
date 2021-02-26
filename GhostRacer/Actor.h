@@ -153,13 +153,16 @@ private:
     double m_plan_distance;
     bool m_has_damaged_ghost_racer;
 };
-/*
+
 class Spray : public Actor
 {
 public:
     Spray(StudentWorld* sw, double x, double y, int dir);
     virtual void doSomething();
+private:
+    int m_travel_dist;
 };
+
 
 class GhostRacerActivatedObject : public Actor
 {
@@ -228,5 +231,5 @@ public:
     virtual bool selfDestructs() const;
     virtual bool isSprayable() const;
 };
-*/
+
 #endif // ACTOR_H_

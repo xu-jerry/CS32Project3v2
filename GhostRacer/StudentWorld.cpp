@@ -113,7 +113,7 @@ int StudentWorld::move()
     if (ChanceVehicle1 == 0) {
         int found_lane = -1;
         double start_y = -1;
-        double v_speed;
+        double v_speed = 0;
         vector<int> columns = {0, 1, 2};
         for (int i = 0; i < 3; i++) {
             int col_num = randInt(0, columns.size() - 1);
