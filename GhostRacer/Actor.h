@@ -126,7 +126,7 @@ public:
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
 };
-
+/*
 class ZombieCab : public Agent
 {
 public:
@@ -209,5 +209,5 @@ public:
     virtual bool selfDestructs() const;
     virtual bool isSprayable() const;
 };
-
+*/
 #endif // ACTOR_H_

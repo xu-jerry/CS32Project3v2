@@ -74,6 +74,40 @@
 			<key>uniqueIdentifier</key>
 			<string>73FCC13E-A3D0-4C16-940E-4500B68A61DB</string>
 		</dict>
+		<key>74408890-3D94-4545-B4E5-16B2E6EB2D08</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>74408890-3D94-4545-B4E5-16B2E6EB2D08.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>GhostRacer project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>GhostRacer</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Run GhostRacer</string>
+			<key>timeStartedRecording</key>
+			<real>636012768.37441397</real>
+			<key>timeStoppedRecording</key>
+			<real>636012776.00809205</real>
+			<key>title</key>
+			<string>Run GhostRacer</string>
+			<key>uniqueIdentifier</key>
+			<string>74408890-3D94-4545-B4E5-16B2E6EB2D08</string>
+		</dict>
 	</dict>
 </dict>
 </plist>

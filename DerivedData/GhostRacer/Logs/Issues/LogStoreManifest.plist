@@ -34,7 +34,7 @@
 			<key>uniqueIdentifier</key>
 			<string>5E62C214-8C40-4DE3-87B0-A76298D00587</string>
 		</dict>
-		<key>D5B1663E-A63C-47E6-9A76-134C8F773A5B</key>
+		<key>D4EF4343-D3F5-4303-85C5-41A05293EB5A</key>
 		<dict>
 			<key>className</key>
 			<string>IDEActivityLogMajorGroupSection</string>
@@ -43,24 +43,24 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.target.product-type.tool</string>
 			<key>fileName</key>
-			<string>D5B1663E-A63C-47E6-9A76-134C8F773A5B.xcactivitylog</string>
+			<string>D4EF4343-D3F5-4303-85C5-41A05293EB5A.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
 			<dict>
 				<key>highLevelStatus</key>
-				<string>E</string>
+				<string>W</string>
 			</dict>
 			<key>signature</key>
 			<string>GhostRacer-acfcizphplwwmkdkygttvtgursnc</string>
 			<key>timeStartedRecording</key>
-			<real>636011537.78675604</real>
+			<real>636012767.73570096</real>
 			<key>timeStoppedRecording</key>
-			<real>636011538.55397701</real>
+			<real>636012768.36246002</real>
 			<key>title</key>
 			<string>Build target GhostRacer</string>
 			<key>uniqueIdentifier</key>
-			<string>D5B1663E-A63C-47E6-9A76-134C8F773A5B</string>
+			<string>D4EF4343-D3F5-4303-85C5-41A05293EB5A</string>
 		</dict>
 	</dict>
 	<key>preserveOldLogs</key>

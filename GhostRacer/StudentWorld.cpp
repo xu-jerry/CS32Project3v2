@@ -31,3 +31,39 @@ int StudentWorld::move()
 void StudentWorld::cleanUp()
 {
 }
+
+StudentWorld::~StudentWorld() {
+    
+}
+
+GhostRacer* StudentWorld::getGhostRacer() {
+    return nullptr;
+}
+
+  // Add an actor to the world.
+void StudentWorld::addActor(Actor* a) {
+    
+}
+
+  // Record that a soul was saved.
+void StudentWorld::recordSoulSaved() {
+    
+}
+
+  // If actor a overlaps some live actor that is affected by a holy water
+  // projectile, inflict a holy water spray on that actor and return true;
+  // otherwise, return false.  (See Actor::beSprayedIfAppropriate.)
+bool StudentWorld::sprayFirstAppropriateActor(Actor* a) {
+    return false;
+}
+
+  // Return true if actor a1 overlaps actor a2, otherwise false.
+bool StudentWorld::overlaps(const Actor* a1, const Actor* a2) const {
+    return false;
+}
+
+  // If actor a overlaps this world's GhostRacer, return a pointer to the
+  // GhostRacer; otherwise, return nullptr
+GhostRacer* StudentWorld::getOverlappingGhostRacer(Actor* a) const {
+    return nullptr;
+}
