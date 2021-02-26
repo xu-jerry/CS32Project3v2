@@ -117,6 +117,9 @@ public:
       // Move the pedestrian.  If the pedestrian doesn't go off screen and
       // should pick a new movement plan, pick a new plan.
     void moveAndPossiblyPickPlan();
+private:
+    int m_h_speed;
+    double m_plan_distance;
 };
 
 class HumanPedestrian : public Pedestrian

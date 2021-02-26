@@ -198,38 +198,73 @@ void GhostRacer::spin() {
 }
 
 Pedestrian::Pedestrian(StudentWorld* sw, int imageID, double x, double y, double size): Agent(sw, imageID, x, y, size, 0, 2) {
-
+    setHorizSpeed(0);
+    setVerticalSpeed(-4);
+    m_plan_distance = 0;
 }
 
 int Pedestrian::soundWhenHurt() const {
-    return 0;
+    return SOUND_PED_HURT;
 }
 
 int Pedestrian::soundWhenDie() const {
-    return 0;
+    return SOUND_PED_DIE;
 }
 
 // Get the pedestrian's horizontal speed
 int Pedestrian::getHorizSpeed() const {
-    return 0;
+    return m_h_speed;
 }
 
 // Set the pedestrian's horizontal speed
 void Pedestrian::setHorizSpeed(int s) {
-
+    m_h_speed = s;
 }
 
 // Move the pedestrian.  If the pedestrian doesn't go off screen and
 // should pick a new movement plan, pick a new plan.
 void Pedestrian::moveAndPossiblyPickPlan() {
-
+    int vert_speed = getVerticalSpeed() - world()->getGhostRacer()->getVerticalSpeed();
+    int horiz_speed = m_h_speed;
+    int new_y = getY() + vert_speed;
+    int new_x = getX() + horiz_speed;
+    moveTo(new_x, new_y);
+    if (getX() < 0 || getY() < 0 || getX() > VIEW_WIDTH || getY() >
+        VIEW_HEIGHT) {
+        setDead();
+        return;
+    }
+    m_plan_distance--;
+    if (m_plan_distance > 0) {
+        return;
+    }
+    else {
+        m_h_speed = randInt(-3, 3);
+        while (m_h_speed == 0) {
+            m_h_speed = randInt(-3, 3);
+        }
+        m_plan_distance = randInt(4, 32);
+        if (m_h_speed < 0) {
+            setDirection(180);
+        }
+        else {
+            setDirection(0);
+        }
+    }
 }
 
 HumanPedestrian::HumanPedestrian(StudentWorld* sw, double x, double y): Pedestrian(sw, IID_HUMAN_PED, x, y, 2.0){
 
 }
 void HumanPedestrian::doSomething() {
-
+    if (isDead()) {
+        return;
+    }
+    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+        world()->getGhostRacer()->setDead();
+        return;
+    }
+    moveAndPossiblyPickPlan();
 }
 bool HumanPedestrian::beSprayedIfAppropriate() {
     return false;
@@ -244,7 +279,20 @@ ZombiePedestrian::ZombiePedestrian(StudentWorld* sw, double x, double y): Pedest
 
 }
 void ZombiePedestrian::doSomething() {
-
+    if (isDead()) {
+        return;
+    }
+    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+        takeDamageAndPossiblyDie(2);
+        world()->getGhostRacer()->takeDamageAndPossiblyDie(5);
+        return;
+    }
+    // also implement holy water
+    else {
+        // implement later
+        world()->increaseScore(150);
+    }
+    moveAndPossiblyPickPlan();
 }
 bool ZombiePedestrian::beSprayedIfAppropriate() {
     return false;

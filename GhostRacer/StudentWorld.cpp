@@ -97,7 +97,6 @@ int StudentWorld::move()
        m_actors.push_back(temp_yellow2);
    }
    if (delta_y >= 4*SPRITE_HEIGHT) {
-       cout << "test" << endl;
        BorderLine* temp_white1 = new BorderLine(this, ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH/3, new_border_y, false);
        BorderLine* temp_white2 = new BorderLine(this, ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH/3, new_border_y, false);
        m_actors.push_back(temp_white1);
@@ -107,14 +106,14 @@ int StudentWorld::move()
     
    // add zombie cabs
    
-   /*
+   
    // add new human pedestrians
    int ChanceHumanPed = max(200 - getLevel() * 10, 30);
    // CHANGE LATER
    //int ChanceHumanPed = 10;
    int ChanceHumanPed1 = randInt(0, ChanceHumanPed - 1);
    if (ChanceHumanPed1 == 0) {
-       HumanPedestrian* temp = new HumanPedestrian(randInt(0, VIEW_WIDTH), VIEW_HEIGHT, m_ghost_racer, this);
+       HumanPedestrian* temp = new HumanPedestrian(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT);
        m_actors.push_back(temp);
    }
    
@@ -124,14 +123,15 @@ int StudentWorld::move()
    //int ChanceHumanPed = 10;
    int ChanceZombiePed1 = randInt(0, ChanceZombiePed - 1);
    if (ChanceZombiePed1 == 0) {
-       ZombiePedestrian* temp = new ZombiePedestrian(randInt(0, VIEW_WIDTH), VIEW_HEIGHT, m_ghost_racer, this);
+       ZombiePedestrian* temp = new ZombiePedestrian(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT);
        m_actors.push_back(temp);
    }
     
    //Add new actors
+    
+    
    // Update the Game Status display text
    // update the score/lives/level text at screen top
-    */
    m_bonus--;
    ostringstream oss;
    oss << "Score: " << getScore() << "  ";
@@ -172,7 +172,7 @@ GhostRacer* StudentWorld::getGhostRacer() {
 
   // Add an actor to the world.
 void StudentWorld::addActor(Actor* a) {
-    
+    m_actors.push_back(a);
 }
 
   // Record that a soul was saved.
@@ -189,11 +189,20 @@ bool StudentWorld::sprayFirstAppropriateActor(Actor* a) {
 
   // Return true if actor a1 overlaps actor a2, otherwise false.
 bool StudentWorld::overlaps(const Actor* a1, const Actor* a2) const {
+    double delta_x = abs(a1->getX() - a2->getX());
+    double delta_y = abs(a1->getY() - a2->getY());
+    double radius_sum = a1->getRadius() + a2->getRadius();
+    if (delta_x < radius_sum * 0.25 && delta_y < radius_sum * 0.6) {
+        return true;
+    }
     return false;
 }
 
   // If actor a overlaps this world's GhostRacer, return a pointer to the
   // GhostRacer; otherwise, return nullptr
 GhostRacer* StudentWorld::getOverlappingGhostRacer(Actor* a) const {
+    if (overlaps(a, m_ghost_racer)) {
+        return m_ghost_racer;
+    }
     return nullptr;
 }
