@@ -1,5 +1,7 @@
 #include "Actor.h"
 #include "StudentWorld.h"
+using namespace std;
+#define PI 3.14159265359
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 
@@ -90,17 +92,24 @@ void Agent::incHP(int hp) {
 // Do what the spec says happens when hp units of damage is inflicted.
 // Return true if this agent dies as a result, otherwise false.
 bool Agent::takeDamageAndPossiblyDie(int hp) {
+    m_hp -= hp;
+    if (m_hp <= 0) {
+        world()->playSound(soundWhenDie());
+        setDead();
+        return true;
+    }
+    world()->playSound(soundWhenHurt());
     return false;
 }
 
 // What sound should play when this agent is damaged but does not die?
 int Agent::soundWhenHurt() {
-    return 0;
+    return SOUND_VEHICLE_HURT;
 }
 
 // What sound should play when this agent is damaged and dies?
 int Agent::soundWhenDie() {
-    return 0;
+    return SOUND_VEHICLE_DIE;
 }
 
 GhostRacer::GhostRacer(StudentWorld* sw, double x, double y): Agent(sw, IID_GHOST_RACER, x, y, 4.0, 90, 100){
@@ -108,11 +117,69 @@ GhostRacer::GhostRacer(StudentWorld* sw, double x, double y): Agent(sw, IID_GHOS
 }
 
 void GhostRacer::doSomething() {
-
+    if (isDead()) {
+        return;
+    }
+    if (getX() < ROAD_CENTER - ROAD_WIDTH/2) {
+        if (getDirection() > 90) {
+            takeDamageAndPossiblyDie(10);
+            setDirection(82);
+            world()->playSound(SOUND_VEHICLE_CRASH);
+        }
+    }
+    else if (getX() > ROAD_CENTER + ROAD_WIDTH/2)  {
+        if (getDirection() < 90) {
+            takeDamageAndPossiblyDie(10);
+            setDirection(98);
+            world()->playSound(SOUND_VEHICLE_CRASH);
+        }
+    }
+    else {
+        int ch;
+        if (world()->getKey(ch))
+            {
+            // user hit a key during this tick!
+            switch (ch)
+            {
+            case KEY_PRESS_LEFT:
+                if (getDirection() < 114) {
+                    setDirection(getDirection() + 8);
+                }
+            break;
+            case KEY_PRESS_RIGHT:
+                if (getDirection() > 66) {
+                    setDirection(getDirection() - 8);
+                }
+            break;
+                    /*
+            case KEY_PRESS_SPACE:
+            ... add spray in front of Ghost Racer...;
+            break;
+            // etc…
+                     */
+            case KEY_PRESS_UP:
+                if (getVerticalSpeed() < 5) {
+                    setVerticalSpeed(getVerticalSpeed() + 1);
+                }
+                break;
+            case KEY_PRESS_DOWN:
+                if (getVerticalSpeed() > -1) {
+                    setVerticalSpeed(getVerticalSpeed() - 1);
+                }
+                break;
+            }
+        }
+    }
+    double max_shift_per_tick = 4.0;
+    double direction = getDirection();
+    double delta_x = cos(direction * PI / 180) * max_shift_per_tick;
+    double cur_x = getX();
+    double cur_y = getY();
+    moveTo(cur_x + delta_x, cur_y);
 }
 
 int GhostRacer::soundWhenDie() const {
-    return 0;
+    return SOUND_PLAYER_DIE;
 }
 
 // How many holy water projectiles does the object have?
@@ -133,9 +200,11 @@ void GhostRacer::spin() {
 Pedestrian::Pedestrian(StudentWorld* sw, int imageID, double x, double y, double size): Agent(sw, imageID, x, y, size, 0, 2) {
 
 }
+
 int Pedestrian::soundWhenHurt() const {
     return 0;
 }
+
 int Pedestrian::soundWhenDie() const {
     return 0;
 }
