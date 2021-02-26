@@ -53,6 +53,7 @@ class BorderLine : public Actor
 public:
     BorderLine(StudentWorld* sw, double x, double y, bool isYellow);
     virtual void doSomething();
+    virtual bool isCollisionAvoidanceWorthy() const;
 private:
     bool m_is_yellow;
 };
@@ -138,15 +139,19 @@ public:
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
 };
-/*
+
 class ZombieCab : public Agent
 {
 public:
     ZombieCab(StudentWorld* sw, double x, double y);
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
+private:
+    int m_h_speed;
+    double m_plan_distance;
+    bool m_has_damaged_ghost_racer;
 };
-
+/*
 class Spray : public Actor
 {
 public:
