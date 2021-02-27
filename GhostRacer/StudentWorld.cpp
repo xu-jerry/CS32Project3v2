@@ -62,15 +62,14 @@ int StudentWorld::move()
            // tell that actor to do something (e.g. move)
            m_actors[i]->doSomething();
            if (m_ghost_racer->isDead()) {
+               decLives();
                return GWSTATUS_PLAYER_DIED;
            }
-            /*
            if (m_souls2save <= 0) {
                //add bonus points to the score
                increaseScore(m_bonus);
                return GWSTATUS_FINISHED_LEVEL;
            }
-             */
        }
    }
    
@@ -301,10 +300,6 @@ GhostRacer* StudentWorld::getGhostRacer() {
     return m_ghost_racer;
 }
 
-std::vector<Actor*> StudentWorld::getActors() {
-    return m_actors;
-}
-
   // Add an actor to the world.
 void StudentWorld::addActor(Actor* a) {
     m_actors.push_back(a);
@@ -312,8 +307,6 @@ void StudentWorld::addActor(Actor* a) {
 
   // Record that a soul was saved.
 void StudentWorld::recordSoulSaved() {
-    playSound(SOUND_GOT_SOUL);
-    increaseScore(100);
     m_souls2save--;
 }
 
@@ -321,6 +314,15 @@ void StudentWorld::recordSoulSaved() {
   // projectile, inflict a holy water spray on that actor and return true;
   // otherwise, return false.  (See Actor::beSprayedIfAppropriate.)
 bool StudentWorld::sprayFirstAppropriateActor(Actor* a) {
+    for (int i = 0; i < m_actors.size(); i++) {
+        Actor* cur_actor = m_actors[i];
+        if (overlaps(a, cur_actor)) {
+            if (cur_actor->beSprayedIfAppropriate()) {
+                // decrease health of other?
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -342,4 +344,55 @@ GhostRacer* StudentWorld::getOverlappingGhostRacer(Actor* a) const {
         return m_ghost_racer;
     }
     return nullptr;
+}
+
+
+// returns closest actor in front and in same lane
+bool StudentWorld::hasCloseActorFront(Actor* a) {
+    double min_dist_to_actor = -1;
+    for (int i = 0; i < m_actors.size(); i++) {
+        Actor* cur_actor = m_actors[i];
+        if (cur_actor == a) {
+            continue;
+        }
+        if (cur_actor->isCollisionAvoidanceWorthy() && a->getLane() == cur_actor->getLane()) {
+            if (a->getY() < cur_actor->getY()) {
+                if (min_dist_to_actor == -1) {
+                    min_dist_to_actor = cur_actor->getY() - a->getY();
+                }
+                else {
+                    min_dist_to_actor = min(min_dist_to_actor, cur_actor->getY() - a->getY());
+                }
+            }
+        }
+    }
+    if (min_dist_to_actor != -1 && min_dist_to_actor < 96) {
+        return true;
+    }
+    return false;
+}
+
+// return closest actor behind and in same lane
+bool StudentWorld::hasCloseActorBack(Actor* a) {
+    double min_dist_to_actor = VIEW_HEIGHT + 1;
+    for (int i = 0; i < m_actors.size(); i++) {
+        Actor* cur_actor = m_actors[i];
+        if (cur_actor == a) {
+            continue;
+        }
+        if (cur_actor->isCollisionAvoidanceWorthy() && a->getLane() == cur_actor->getLane()) {
+            if (a->getY() > cur_actor->getY()) {
+                if (min_dist_to_actor == VIEW_HEIGHT + 1) {
+                    min_dist_to_actor = a->getY() - cur_actor->getY();
+                }
+                else {
+                    min_dist_to_actor = min(min_dist_to_actor, a->getY() - cur_actor->getY());
+                }
+            }
+        }
+    }
+    if (min_dist_to_actor != VIEW_HEIGHT + 1 && min_dist_to_actor < 96) {
+        return true;
+    }
+    return false;
 }

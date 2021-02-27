@@ -53,6 +53,7 @@ int Actor::getLane() {
 // If this actor is affected by holy water projectiles, then inflict that
 // affect on it and return true; otherwise, return false.
 bool Actor::beSprayedIfAppropriate() {
+    // implement
     return false;
 }
 
@@ -102,6 +103,7 @@ int Agent::getHP() const {
 // Increase hit points by hp.
 void Agent::incHP(int hp) {
     m_hp += hp;
+    m_hp = min(m_hp, 100);
 }
 
 // Do what the spec says happens when hp units of damage is inflicted.
@@ -360,47 +362,13 @@ void ZombieCab::doSomething() {
         return;
     }
     if (getVerticalSpeed() > world()->getGhostRacer()->getVerticalSpeed()) {
-        double min_dist_to_actor = -1;
-        for (int i = 0; i < world()->getActors().size(); i++) {
-            Actor* cur_actor = world()->getActors()[i];
-            if (cur_actor == this) {
-                continue;
-            }
-            if (cur_actor->isCollisionAvoidanceWorthy() && getLane() == cur_actor->getLane()) {
-                if (getY() < cur_actor->getY()) {
-                    if (min_dist_to_actor == -1) {
-                        min_dist_to_actor = cur_actor->getY() - getY();
-                    }
-                    else {
-                        min_dist_to_actor = min(min_dist_to_actor, cur_actor->getY() - getY());
-                    }
-                }
-            }
-        }
-        if (min_dist_to_actor != -1 && min_dist_to_actor < 96) {
+        if (world()->hasCloseActorFront(this)) {
             setVerticalSpeed(getVerticalSpeed() - 0.5);
             return;
         }
     }
     else {
-        double min_dist_to_actor = VIEW_HEIGHT + 1;
-        for (int i = 0; i < world()->getActors().size(); i++) {
-            Actor* cur_actor = world()->getActors()[i];
-            if (cur_actor == this) {
-                continue;
-            }
-            if (cur_actor->isCollisionAvoidanceWorthy() && getLane() == cur_actor->getLane()) {
-                if (getY() > cur_actor->getY()) {
-                    if (min_dist_to_actor == VIEW_HEIGHT + 1) {
-                        min_dist_to_actor = getY() - cur_actor->getY();
-                    }
-                    else {
-                        min_dist_to_actor = min(min_dist_to_actor, getY() - cur_actor->getY());
-                    }
-                }
-            }
-        }
-        if (min_dist_to_actor != VIEW_HEIGHT + 1 && min_dist_to_actor < 96) {
+        if (world()->hasCloseActorBack(this)) {
             setVerticalSpeed(getVerticalSpeed() + 0.5);
             return;
         }
@@ -429,15 +397,9 @@ void Spray::doSomething() {
     if (isDead()) {
         return;
     }
-    for (int i = 0; i < world()->getActors().size(); i++) {
-        Actor* cur_actor = world()->getActors()[i];
-        if (world()->overlaps(this, cur_actor)) {
-            if (cur_actor->beSprayedIfAppropriate()) {
-                // decrease health of other?
-                setDead();
-                return;
-            }
-        }
+    if (world()->sprayFirstAppropriateActor(this)) {
+        setDead();
+        return;
     }
     moveForward(SPRITE_HEIGHT);
     m_travel_dist -= SPRITE_HEIGHT;
@@ -456,6 +418,18 @@ bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
     return false;
 }
 
+void GhostRacerActivatedObject::doSomething() {
+    moveRelativeToGhostRacerVerticalSpeed(0);
+    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+        doActivity(world()->getOverlappingGhostRacer(this));
+        world()->playSound(getSound());
+        world()->increaseScore(getScoreIncrease());
+        if (selfDestructs()) {
+            setDead();
+        }
+    }
+}
+
 // Return the sound to be played when the object is activated.
 int GhostRacerActivatedObject::getSound() const {
     // implement
@@ -467,23 +441,19 @@ OilSlick::OilSlick(StudentWorld* sw, double x, double y) : GhostRacerActivatedOb
 
 }
 
-void OilSlick::doSomething() {
-    moveRelativeToGhostRacerVerticalSpeed(0);
-
-}
 void OilSlick::doActivity(GhostRacer* gr) {
-
+    gr->spin();
 }
+
 int OilSlick::getScoreIncrease() const {
-    // implement
     return 0;
 }
+
 int OilSlick::getSound() const {
     return SOUND_OIL_SLICK;
 }
 
 bool OilSlick::selfDestructs() const {
-    // implement
     return false;
 }
 
@@ -495,50 +465,36 @@ HealingGoodie::HealingGoodie(StudentWorld* sw, double x, double y) : GhostRacerA
 
 }
 
-void HealingGoodie::doSomething() {
-    moveRelativeToGhostRacerVerticalSpeed(0);
-}
-
 void HealingGoodie::doActivity(GhostRacer* gr) {
-
+    gr->incHP(10);
 }
 
 int HealingGoodie::getScoreIncrease() const {
-    // implement
-    return 0;
+    return 250;
 }
 
 bool HealingGoodie::selfDestructs() const {
-    //implement
-    return false;
-
-}
-bool HealingGoodie::isSprayable() const {
     return true;
 }
 
+bool HealingGoodie::isSprayable() const {
+    return true;
+}
 
 HolyWaterGoodie::HolyWaterGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_HOLY_WATER_GOODIE, x, y, 2.0, 90){
 
 }
 
-void HolyWaterGoodie::doSomething() {
-    moveRelativeToGhostRacerVerticalSpeed(0);
-}
-
 void HolyWaterGoodie::doActivity(GhostRacer* gr) {
-
+    gr->increaseSprays(10);
 }
 
 int HolyWaterGoodie::getScoreIncrease() const {
-    //implement
-    return 0;
-
+    return 50;
 }
 
 bool HolyWaterGoodie::selfDestructs() const {
-    // implement
-    return false;
+    return true;
 }
 
 bool HolyWaterGoodie::isSprayable() const {
@@ -550,19 +506,16 @@ SoulGoodie::SoulGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivat
 }
 
 void SoulGoodie::doSomething() {
-    moveRelativeToGhostRacerVerticalSpeed(0);
-    
-    // add
+    GhostRacerActivatedObject::doSomething();
     setDirection((getDirection() + 10) % 360);
 }
 
 void SoulGoodie::doActivity(GhostRacer* gr) {
-
+    world()->recordSoulSaved();
 }
 
 int SoulGoodie::getScoreIncrease() const {
-    //implement
-    return 0;
+    return 100;
 }
 
 int SoulGoodie::getSound() const {
@@ -570,8 +523,7 @@ int SoulGoodie::getSound() const {
 }
 
 bool SoulGoodie::selfDestructs() const {
-    // implement
-    return false;
+    return true;
 }
 
 bool SoulGoodie::isSprayable() const {

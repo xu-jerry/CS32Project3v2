@@ -169,6 +169,8 @@ class GhostRacerActivatedObject : public Actor
 public:
     GhostRacerActivatedObject(StudentWorld* sw, int imageID, double x, double y, double size, int dir);
     virtual bool beSprayedIfAppropriate();
+    
+    virtual void doSomething();
 
       // Do the object's special activity (increase health, spin Ghostracer, etc.)
     virtual void doActivity(GhostRacer* gr) = 0;
@@ -190,7 +192,6 @@ class OilSlick : public GhostRacerActivatedObject
 {
 public:
     OilSlick(StudentWorld* sw, double x, double y);
-    virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual int getSound() const;
@@ -202,7 +203,6 @@ class HealingGoodie : public GhostRacerActivatedObject
 {
 public:
     HealingGoodie(StudentWorld* sw, double x, double y);
-    virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual bool selfDestructs() const;
@@ -213,7 +213,6 @@ class HolyWaterGoodie : public GhostRacerActivatedObject
 {
 public:
     HolyWaterGoodie(StudentWorld* sw, double x, double y);
-    virtual void doSomething();
     virtual void doActivity(GhostRacer* gr);
     virtual int getScoreIncrease() const;
     virtual bool selfDestructs() const;

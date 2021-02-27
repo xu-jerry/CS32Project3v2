@@ -21,15 +21,18 @@ public:
 
       // Return a pointer to the world's GhostRacer.
     GhostRacer* getGhostRacer();
-    
-    // return a list of actors
-    std::vector<Actor*> getActors();
 
       // Add an actor to the world.
     void addActor(Actor* a);
 
       // Record that a soul was saved.
     void recordSoulSaved();
+    
+    // returns whether any actor is close, in front, and in same lane
+    bool hasCloseActorFront(Actor* a);
+    
+    // return whether any actor is close, behind, and in same lane
+    bool hasCloseActorBack(Actor* a);
 
       // If actor a overlaps some live actor that is affected by a holy water
       // projectile, inflict a holy water spray on that actor and return true;
