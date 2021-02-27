@@ -236,7 +236,29 @@ int StudentWorld::move()
        m_actors.push_back(temp);
    }
     
-   //Add new actors
+    // add new oil slicks
+    int ChanceOilSlick = max(150 - getLevel() * 10, 40);
+    int ChanceOilSlick1 = randInt(0, ChanceOilSlick - 1);
+    if (ChanceOilSlick1 == 0) {
+        OilSlick* temp = new OilSlick(this, randInt(ROAD_CENTER - ROAD_WIDTH / 2, ROAD_CENTER + ROAD_WIDTH / 2), VIEW_HEIGHT);
+        m_actors.push_back(temp);
+    }
+    
+    // add new holy water goodies
+    int ChanceHolyWater = 100 + getLevel() * 10;
+    int ChanceHolyWater1 = randInt(0, ChanceHolyWater - 1);
+    if (ChanceHolyWater1 == 0) {
+        HolyWaterGoodie* temp = new HolyWaterGoodie(this, randInt(ROAD_CENTER - ROAD_WIDTH / 2, ROAD_CENTER + ROAD_WIDTH / 2), VIEW_HEIGHT);
+        m_actors.push_back(temp);
+    }
+    
+    // add new soul goodies
+    int ChanceSoulGoodie = 100;
+    int ChanceSoulGoodie1 = randInt(0, ChanceSoulGoodie - 1);
+    if (ChanceSoulGoodie1 == 0) {
+        SoulGoodie* temp = new SoulGoodie(this, randInt(ROAD_CENTER - ROAD_WIDTH / 2, ROAD_CENTER + ROAD_WIDTH / 2), VIEW_HEIGHT);
+        m_actors.push_back(temp);
+    }
     
     
    // Update the Game Status display text

@@ -22,6 +22,7 @@ public:
       // Return a pointer to the world's GhostRacer.
     GhostRacer* getGhostRacer();
     
+    // return a list of actors
     std::vector<Actor*> getActors();
 
       // Add an actor to the world.

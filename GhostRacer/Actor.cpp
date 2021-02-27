@@ -213,7 +213,22 @@ void GhostRacer::increaseSprays(int amt) {
 
 // Spin as a result of hitting an oil slick.
 void GhostRacer::spin() {
-
+    while (true) {
+        int dir_amount = randInt(5, 20);
+        int sign = randInt(0, 1);
+        if (sign == 0) {
+            if (getDirection() - dir_amount >= 60) {
+                setDirection(getDirection() - dir_amount);
+                return;
+            }
+        }
+        else {
+            if (getDirection() + dir_amount <= 120) {
+                setDirection(getDirection() + dir_amount);
+                return;
+            }
+        }
+    }
 }
 
 Pedestrian::Pedestrian(StudentWorld* sw, int imageID, double x, double y, double size): Agent(sw, imageID, x, y, size, 0, 2) {
@@ -321,6 +336,7 @@ ZombieCab::ZombieCab(StudentWorld* sw, double x, double y): Agent(sw, IID_ZOMBIE
     m_plan_distance = 0;
     m_has_damaged_ghost_racer = false;
 }
+
 void ZombieCab::doSomething() {
     if (isDead()) {
         return;
@@ -432,6 +448,7 @@ void Spray::doSomething() {
 
 
 GhostRacerActivatedObject::GhostRacerActivatedObject(StudentWorld* sw, int imageID, double x, double y, double size, int dir) :Actor(sw, imageID, x, y, size, dir, 2) {
+    setVerticalSpeed(-4);
 
 }
 bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
@@ -449,7 +466,9 @@ int GhostRacerActivatedObject::getSound() const {
 OilSlick::OilSlick(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_OIL_SLICK, x, y, randInt(2, 5), 0){
 
 }
+
 void OilSlick::doSomething() {
+    moveRelativeToGhostRacerVerticalSpeed(0);
 
 }
 void OilSlick::doActivity(GhostRacer* gr) {
@@ -475,16 +494,20 @@ bool OilSlick::isSprayable() const {
 HealingGoodie::HealingGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_HEAL_GOODIE, x, y, 1.0, 0) {
 
 }
-void HealingGoodie::doSomething() {
 
+void HealingGoodie::doSomething() {
+    moveRelativeToGhostRacerVerticalSpeed(0);
 }
+
 void HealingGoodie::doActivity(GhostRacer* gr) {
 
 }
+
 int HealingGoodie::getScoreIncrease() const {
     // implement
     return 0;
 }
+
 bool HealingGoodie::selfDestructs() const {
     //implement
     return false;
@@ -500,7 +523,7 @@ HolyWaterGoodie::HolyWaterGoodie(StudentWorld* sw, double x, double y) : GhostRa
 }
 
 void HolyWaterGoodie::doSomething() {
-
+    moveRelativeToGhostRacerVerticalSpeed(0);
 }
 
 void HolyWaterGoodie::doActivity(GhostRacer* gr) {
@@ -527,7 +550,10 @@ SoulGoodie::SoulGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivat
 }
 
 void SoulGoodie::doSomething() {
-
+    moveRelativeToGhostRacerVerticalSpeed(0);
+    
+    // add
+    setDirection((getDirection() + 10) % 360);
 }
 
 void SoulGoodie::doActivity(GhostRacer* gr) {
