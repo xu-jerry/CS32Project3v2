@@ -16,6 +16,7 @@ GameWorld* createStudentWorld(string assetPath)
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
 {
+    // make sure no crashes if quit before init
     m_ghost_racer = nullptr;
 }
 
@@ -48,7 +49,7 @@ int StudentWorld::init()
         m_actors.push_back(left_middle_white);
         m_actors.push_back(right_middle_white);
     }
-    m_last_white_border_y = (M - 1) * (4*SPRITE_HEIGHT);
+    m_last_white_border_y = (M - 1) * (4 * SPRITE_HEIGHT);
     
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -104,16 +105,14 @@ int StudentWorld::move()
    }
     
    // add zombie cabs
-   
-    
     int ChanceVehicle = max(100 - getLevel() * 10, 20);
-    //int ChanceVehicle = 5;
     int ChanceVehicle1 =  randInt(0, ChanceVehicle - 1);
     if (ChanceVehicle1 == 0) {
         int found_lane = -1;
         double start_y = -1;
         double v_speed = 0;
         vector<int> columns = {0, 1, 2};
+        //
         for (int i = 0; i < 3; i++) {
             int col_num = randInt(0, columns.size() - 1);
             int cur_lane = columns[col_num];

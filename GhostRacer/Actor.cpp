@@ -53,7 +53,6 @@ int Actor::getLane() {
 // If this actor is affected by holy water projectiles, then inflict that
 // affect on it and return true; otherwise, return false.
 bool Actor::beSprayedIfAppropriate() {
-    // implement
     return false;
 }
 
@@ -67,7 +66,6 @@ bool Actor::isCollisionAvoidanceWorthy() const {
 // vertical speed.  Return true if the new position is within the view;
 // otherwise, return false, with the actor dead.
 bool Actor::moveRelativeToGhostRacerVerticalSpeed(double dx) {
-    
     moveTo(getX() + dx, getY() + getVerticalSpeed() - world()->getGhostRacer()->getVerticalSpeed());
     if (getX() < 0 || getY() < 0 || getX() > VIEW_WIDTH || getY() >
         VIEW_HEIGHT) {
@@ -88,7 +86,6 @@ void BorderLine::doSomething() {
 
 Agent::Agent(StudentWorld* sw, int imageID, double x, double y, double size, int dir, int hp): Actor(sw, imageID, x, y, size, dir, 0){
     m_hp = hp;
-
 }
 
 bool Agent::isCollisionAvoidanceWorthy() const {
@@ -308,7 +305,7 @@ bool HumanPedestrian::takeDamageAndPossiblyDie(int hp) {
 }
 
 ZombiePedestrian::ZombiePedestrian(StudentWorld* sw, double x, double y): Pedestrian(sw, IID_ZOMBIE_PED, x, y, 3.0) {
-
+    m_time_until_grunt = 0;
 }
 void ZombiePedestrian::doSomething() {
     if (isDead()) {
@@ -319,16 +316,35 @@ void ZombiePedestrian::doSomething() {
         world()->getGhostRacer()->takeDamageAndPossiblyDie(5);
         return;
     }
-    // also implement holy water
-    else {
-        // implement later
-        world()->increaseScore(150);
+    if (abs(getX() - world()->getGhostRacer()->getX()) <= 30 && getY() > world()->getGhostRacer()->getY()) {
+        setDirection(270);
+        if (getX() < world()->getGhostRacer()->getX()) {
+            setHorizSpeed(1);
+        }
+        else if (getX() > world()->getGhostRacer()->getX()) {
+            setHorizSpeed(-1);
+        }
+        else {
+            setHorizSpeed(0);
+        }
+        m_time_until_grunt--;
+        if (m_time_until_grunt <= 0) {
+            world()->playSound(SOUND_ZOMBIE_ATTACK);
+            m_time_until_grunt = 20;
+        }
     }
     moveAndPossiblyPickPlan();
 }
+
 bool ZombiePedestrian::beSprayedIfAppropriate() {
     if (takeDamageAndPossiblyDie(1)) {
-        // leave something
+        if (world()->getOverlappingGhostRacer(this) == nullptr) {
+            int chanceHealing = randInt(0, 4);
+            if (chanceHealing == 0) {
+                HealingGoodie* temp = new HealingGoodie(world(), getX(), getY());
+                world()->addActor(temp);
+            }
+        }
     }
     return true;
 }
@@ -383,7 +399,13 @@ void ZombieCab::doSomething() {
 
 bool ZombieCab::beSprayedIfAppropriate() {
     if(takeDamageAndPossiblyDie(1)) {
-        // leave oil
+        if (world()->getOverlappingGhostRacer(this) == nullptr) {
+            int chanceOil = randInt(0, 4);
+            if (chanceOil == 0) {
+                OilSlick* temp = new OilSlick(world(), getX(), getY());
+                world()->addActor(temp);
+            }
+        }
     }
     return true;
 }
@@ -414,7 +436,9 @@ GhostRacerActivatedObject::GhostRacerActivatedObject(StudentWorld* sw, int image
 
 }
 bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
-    //possible implement
+    if (isSprayable()) {
+        setDead();
+    }
     return false;
 }
 
@@ -432,8 +456,7 @@ void GhostRacerActivatedObject::doSomething() {
 
 // Return the sound to be played when the object is activated.
 int GhostRacerActivatedObject::getSound() const {
-    // implement
-    return 0;
+    return SOUND_GOT_GOODIE;
 }
 
 

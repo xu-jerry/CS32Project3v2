@@ -140,6 +140,8 @@ public:
     ZombiePedestrian(StudentWorld* sw, double x, double y);
     virtual void doSomething();
     virtual bool beSprayedIfAppropriate();
+private:
+    int m_time_until_grunt;
 };
 
 class ZombieCab : public Agent
