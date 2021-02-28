@@ -280,7 +280,6 @@ bool StudentWorld::sprayFirstAppropriateActor(Actor* a) {
         Actor* cur_actor = m_actors[i];
         if (overlaps(a, cur_actor)) {
             if (cur_actor->beSprayedIfAppropriate()) {
-                // decrease health of other?
                 return true;
             }
         }

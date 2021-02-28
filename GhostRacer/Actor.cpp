@@ -37,6 +37,7 @@ void Actor::setVerticalSpeed(double speed) {
     m_v_speed = speed;
 }
 
+// get which lane it is in (left = 0, middle = 1, right = 2)
 int Actor::getLane() {
     if (getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
         return 0;
@@ -75,19 +76,24 @@ bool Actor::moveRelativeToGhostRacerVerticalSpeed(double dx) {
     return true;
 }
 
+// constructor
 BorderLine::BorderLine(StudentWorld* sw, double x, double y, bool isYellow): Actor(sw, isYellow? IID_YELLOW_BORDER_LINE: IID_WHITE_BORDER_LINE, x, y, 2.0, 0, 2){
     setVerticalSpeed(-4);
     isYellow? m_is_yellow = true: m_is_yellow = false;
     
 }
+
+// what borderlines do in a tick
 void BorderLine::doSomething() {
     moveRelativeToGhostRacerVerticalSpeed(0);
 }
 
+// constructor
 Agent::Agent(StudentWorld* sw, int imageID, double x, double y, double size, int dir, int hp): Actor(sw, imageID, x, y, size, dir, 0){
     m_hp = hp;
 }
 
+// all agents are collision avoidance worthy
 bool Agent::isCollisionAvoidanceWorthy() const {
     return true;
 }
@@ -126,10 +132,12 @@ int Agent::soundWhenDie() {
     return SOUND_VEHICLE_DIE;
 }
 
+// constructor
 GhostRacer::GhostRacer(StudentWorld* sw, double x, double y): Agent(sw, IID_GHOST_RACER, x, y, 4.0, 90, 100){
     m_num_sprays = 10;
 }
 
+// what ghost racer does in a tick
 void GhostRacer::doSomething() {
     if (isDead()) {
         return;
@@ -196,6 +204,7 @@ void GhostRacer::doSomething() {
     moveTo(cur_x + delta_x, cur_y);
 }
 
+// return sound when ghost racer dies
 int GhostRacer::soundWhenDie() const {
     return SOUND_PLAYER_DIE;
 }
@@ -230,16 +239,19 @@ void GhostRacer::spin() {
     }
 }
 
+// constructor
 Pedestrian::Pedestrian(StudentWorld* sw, int imageID, double x, double y, double size): Agent(sw, imageID, x, y, size, 0, 2) {
     setHorizSpeed(0);
     setVerticalSpeed(-4);
     m_plan_distance = 0;
 }
 
+// return sound when pedestrian is hurt
 int Pedestrian::soundWhenHurt() const {
     return SOUND_PED_HURT;
 }
 
+// return sound when pedestrian dies
 int Pedestrian::soundWhenDie() const {
     return SOUND_PED_DIE;
 }
@@ -279,9 +291,11 @@ void Pedestrian::moveAndPossiblyPickPlan() {
     }
 }
 
+// constructor
 HumanPedestrian::HumanPedestrian(StudentWorld* sw, double x, double y): Pedestrian(sw, IID_HUMAN_PED, x, y, 2.0){
-
 }
+
+// what human pedestrians do in a tick
 void HumanPedestrian::doSomething() {
     if (isDead()) {
         return;
@@ -292,21 +306,26 @@ void HumanPedestrian::doSomething() {
     }
     moveAndPossiblyPickPlan();
 }
+
+// get sprayed by holy water
 bool HumanPedestrian::beSprayedIfAppropriate() {
     setHorizSpeed(getHorizSpeed() * -1);
     setDirection(180 - getDirection());
     world()->playSound(SOUND_PED_HURT);
     return true;
-
 }
+
+// human pedestrians don't take damage
 bool HumanPedestrian::takeDamageAndPossiblyDie(int hp) {
     return false;
-
 }
 
+// constructor
 ZombiePedestrian::ZombiePedestrian(StudentWorld* sw, double x, double y): Pedestrian(sw, IID_ZOMBIE_PED, x, y, 3.0) {
     m_time_until_grunt = 0;
 }
+
+// what zombie pedestrians do in a tick
 void ZombiePedestrian::doSomething() {
     if (isDead()) {
         return;
@@ -336,6 +355,7 @@ void ZombiePedestrian::doSomething() {
     moveAndPossiblyPickPlan();
 }
 
+// spray zombie pedestrian
 bool ZombiePedestrian::beSprayedIfAppropriate() {
     if (takeDamageAndPossiblyDie(1)) {
         if (!(world()->overlapsGhostRacer(this))) {
@@ -349,12 +369,14 @@ bool ZombiePedestrian::beSprayedIfAppropriate() {
     return true;
 }
 
+// constructor
 ZombieCab::ZombieCab(StudentWorld* sw, double x, double y): Agent(sw, IID_ZOMBIE_CAB, x, y, 4.0, 90, 3){
     m_h_speed = 0;
     m_plan_distance = 0;
     m_has_damaged_ghost_racer = false;
 }
 
+// what zombie cabs do in a tick
 void ZombieCab::doSomething() {
     if (isDead()) {
         return;
@@ -397,6 +419,7 @@ void ZombieCab::doSomething() {
     setVerticalSpeed(getVerticalSpeed() + randInt(-2, 2));
 }
 
+// get sprayed
 bool ZombieCab::beSprayedIfAppropriate() {
     if(takeDamageAndPossiblyDie(1)) {
         if (!(world()->overlapsGhostRacer(this))) {
@@ -410,11 +433,13 @@ bool ZombieCab::beSprayedIfAppropriate() {
     return true;
 }
 
+// constructor
 Spray::Spray(StudentWorld* sw, double x, double y, int dir): Actor(sw, IID_HOLY_WATER_PROJECTILE, x, y, 1.0, dir, 1) {
     m_travel_dist = 160;
     setVerticalSpeed(SPRITE_HEIGHT);
 }
 
+// what sprays do in a tick
 void Spray::doSomething() {
     if (isDead()) {
         return;
@@ -430,11 +455,12 @@ void Spray::doSomething() {
     }
 }
 
-
+// constructor
 GhostRacerActivatedObject::GhostRacerActivatedObject(StudentWorld* sw, int imageID, double x, double y, double size, int dir) :Actor(sw, imageID, x, y, size, dir, 2) {
     setVerticalSpeed(-4);
-
 }
+
+// spray if issprayable
 bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
     if (isSprayable()) {
         setDead();
@@ -442,6 +468,7 @@ bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
     return false;
 }
 
+// what objects do in a tick
 void GhostRacerActivatedObject::doSomething() {
     if (!moveRelativeToGhostRacerVerticalSpeed(0)) {
         return;
@@ -456,102 +483,109 @@ void GhostRacerActivatedObject::doSomething() {
     }
 }
 
+// return if self destructs after ghost racer touches it
+bool GhostRacerActivatedObject::selfDestructs() const {
+    return true;
+}
+
 // Return the sound to be played when the object is activated.
 int GhostRacerActivatedObject::getSound() const {
     return SOUND_GOT_GOODIE;
 }
 
-
-OilSlick::OilSlick(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_OIL_SLICK, x, y, randInt(2, 5), 0){
-
+// constructor
+OilSlick::OilSlick(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_OIL_SLICK, x, y, randInt(2, 5), 0){\
 }
 
+// what oil slicks do when ghost racer touches it
 void OilSlick::doActivity(GhostRacer* gr) {
     gr->spin();
 }
 
+// oil slicks don't increase score
 int OilSlick::getScoreIncrease() const {
     return 0;
 }
 
+// sound for oil slick
 int OilSlick::getSound() const {
     return SOUND_OIL_SLICK;
 }
 
+// oil slicks don't die if ghost racer touches it
 bool OilSlick::selfDestructs() const {
     return false;
 }
 
+// oil slicks aren't affected by holy water
 bool OilSlick::isSprayable() const {
     return false;
 }
 
+// constructor
 HealingGoodie::HealingGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_HEAL_GOODIE, x, y, 1.0, 0) {
-
 }
 
+// what healing goodies do when ghost racer touches it
 void HealingGoodie::doActivity(GhostRacer* gr) {
     gr->incHP(10);
 }
 
+// healing goodies increase score by 250
 int HealingGoodie::getScoreIncrease() const {
     return 250;
 }
 
-bool HealingGoodie::selfDestructs() const {
-    return true;
-}
-
+// healing goodies die when sprayed
 bool HealingGoodie::isSprayable() const {
     return true;
 }
 
+// constructor
 HolyWaterGoodie::HolyWaterGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_HOLY_WATER_GOODIE, x, y, 2.0, 90){
-
 }
 
+// what holy water does when ghost racer touches it
 void HolyWaterGoodie::doActivity(GhostRacer* gr) {
     gr->increaseSprays(10);
 }
 
+// holy water increases score by 50
 int HolyWaterGoodie::getScoreIncrease() const {
     return 50;
 }
 
-bool HolyWaterGoodie::selfDestructs() const {
-    return true;
-}
-
+// holy water dies when sprayed
 bool HolyWaterGoodie::isSprayable() const {
     return true;
 }
 
+// constructor
 SoulGoodie::SoulGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivatedObject(sw, IID_SOUL_GOODIE, x, y, 4.0, 0){
-
 }
 
+// soul goodies spin in addition to doing something
 void SoulGoodie::doSomething() {
     GhostRacerActivatedObject::doSomething();
     setDirection(getDirection() + 10);
 }
 
+// what soul goodies do when touched by ghost racer
 void SoulGoodie::doActivity(GhostRacer* gr) {
     world()->recordSoulSaved();
 }
 
+// soul goodies increase score by 100
 int SoulGoodie::getScoreIncrease() const {
     return 100;
 }
 
+// soul goodie's sound
 int SoulGoodie::getSound() const {
     return SOUND_GOT_SOUL;
 }
 
-bool SoulGoodie::selfDestructs() const {
-    return true;
-}
-
+// soul goodies aren't affected by spray
 bool SoulGoodie::isSprayable() const {
     return false;
 }
-
