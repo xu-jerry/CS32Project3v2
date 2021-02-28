@@ -45,7 +45,7 @@ public:
       // determined by this actor's vertical speed relative to GhostRacser's
       // vertical speed.  Return true if the new position is within the view;
       // otherwise, return false, with the actor dead.
-    virtual bool moveRelativeToGhostRacerVerticalSpeed(double dx);
+    bool moveRelativeToGhostRacerVerticalSpeed(double dx);
 private:
     bool m_alive;
     StudentWorld* m_student_world;

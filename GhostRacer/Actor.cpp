@@ -370,7 +370,7 @@ bool ZombiePedestrian::beSprayedIfAppropriate() {
 }
 
 // constructor
-ZombieCab::ZombieCab(StudentWorld* sw, double x, double y): Agent(sw, IID_ZOMBIE_CAB, x, y, 4.0, 90, 3){
+ZombieCab::ZombieCab(StudentWorld* sw, double x, double y): Agent(sw, IID_ZOMBIE_CAB, x, y, 4.0, 90, 3) {
     m_h_speed = 0;
     m_plan_distance = 0;
     m_has_damaged_ghost_racer = false;
