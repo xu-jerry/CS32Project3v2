@@ -286,7 +286,7 @@ void HumanPedestrian::doSomething() {
     if (isDead()) {
         return;
     }
-    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+    if (world()->overlapsGhostRacer(this)) {
         world()->getGhostRacer()->setDead();
         return;
     }
@@ -311,7 +311,7 @@ void ZombiePedestrian::doSomething() {
     if (isDead()) {
         return;
     }
-    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+    if (world()->overlapsGhostRacer(this)) {
         takeDamageAndPossiblyDie(2);
         world()->getGhostRacer()->takeDamageAndPossiblyDie(5);
         return;
@@ -338,7 +338,7 @@ void ZombiePedestrian::doSomething() {
 
 bool ZombiePedestrian::beSprayedIfAppropriate() {
     if (takeDamageAndPossiblyDie(1)) {
-        if (world()->getOverlappingGhostRacer(this) == nullptr) {
+        if (!(world()->overlapsGhostRacer(this))) {
             int chanceHealing = randInt(0, 4);
             if (chanceHealing == 0) {
                 HealingGoodie* temp = new HealingGoodie(world(), getX(), getY());
@@ -359,7 +359,7 @@ void ZombieCab::doSomething() {
     if (isDead()) {
         return;
     }
-    if (world()->getOverlappingGhostRacer(this) != nullptr) {
+    if (world()->overlapsGhostRacer(this)) {
         if (!m_has_damaged_ghost_racer) {
             world()->playSound(SOUND_VEHICLE_CRASH);
             world()->getGhostRacer()->takeDamageAndPossiblyDie(20);
@@ -399,7 +399,7 @@ void ZombieCab::doSomething() {
 
 bool ZombieCab::beSprayedIfAppropriate() {
     if(takeDamageAndPossiblyDie(1)) {
-        if (world()->getOverlappingGhostRacer(this) == nullptr) {
+        if (!(world()->overlapsGhostRacer(this))) {
             int chanceOil = randInt(0, 4);
             if (chanceOil == 0) {
                 OilSlick* temp = new OilSlick(world(), getX(), getY());
@@ -443,9 +443,11 @@ bool GhostRacerActivatedObject::beSprayedIfAppropriate() {
 }
 
 void GhostRacerActivatedObject::doSomething() {
-    moveRelativeToGhostRacerVerticalSpeed(0);
-    if (world()->getOverlappingGhostRacer(this) != nullptr) {
-        doActivity(world()->getOverlappingGhostRacer(this));
+    if (!moveRelativeToGhostRacerVerticalSpeed(0)) {
+        return;
+    }
+    if (world()->overlapsGhostRacer(this)) {
+        doActivity(world()->getGhostRacer());
         world()->playSound(getSound());
         world()->increaseScore(getScoreIncrease());
         if (selfDestructs()) {
@@ -530,7 +532,7 @@ SoulGoodie::SoulGoodie(StudentWorld* sw, double x, double y) : GhostRacerActivat
 
 void SoulGoodie::doSomething() {
     GhostRacerActivatedObject::doSomething();
-    setDirection((getDirection() + 10) % 360);
+    setDirection(getDirection() + 10);
 }
 
 void SoulGoodie::doActivity(GhostRacer* gr) {

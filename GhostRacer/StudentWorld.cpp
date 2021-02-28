@@ -62,10 +62,12 @@ int StudentWorld::move()
         if (!m_actors[i]->isDead()){
            // tell that actor to do something (e.g. move)
            m_actors[i]->doSomething();
+            // check if GhostRacer died
            if (m_ghost_racer->isDead()) {
                decLives();
                return GWSTATUS_PLAYER_DIED;
            }
+            // check if completed level
            if (m_souls2save <= 0) {
                //add bonus points to the score
                increaseScore(m_bonus);
@@ -112,7 +114,6 @@ int StudentWorld::move()
         double start_y = -1;
         double v_speed = 0;
         vector<int> columns = {0, 1, 2};
-        //
         for (int i = 0; i < 3; i++) {
             int col_num = randInt(0, columns.size() - 1);
             int cur_lane = columns[col_num];
@@ -121,24 +122,7 @@ int StudentWorld::move()
                 min_y = m_ghost_racer->getY();
             }
             for (int j = 0; j < m_actors.size(); j++) {
-                bool in_lane = false;
-                switch (cur_lane) {
-                    case 0:
-                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && m_actors[j]->getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
-                            in_lane = true;
-                        }
-                        break;
-                    case 1:
-                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3) {
-                            in_lane = true;
-                        }
-                        break;
-                    default:
-                        if (m_actors[j]->getX() >= ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2) {
-                            in_lane = true;
-                        }
-                        break;
-                }
+                bool in_lane = (m_actors[i]->getLane() == cur_lane);
                 if (m_actors[j]->isCollisionAvoidanceWorthy() && in_lane) {
                     if (min_y == -1) {
                         min_y = m_actors[j]->getY();
@@ -155,29 +139,8 @@ int StudentWorld::move()
                 break;
             }
             double max_y = VIEW_HEIGHT + 1;
-            if (m_ghost_racer->getLane() == cur_lane) {
-                max_y = m_ghost_racer->getY();
-            }
             for (int j = 0; j < m_actors.size(); j++) {
-                bool in_lane = false;
-                switch (cur_lane) {
-                        // change later
-                    case 0:
-                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 && m_actors[j]->getX() < ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3) {
-                            in_lane = true;
-                        }
-                        break;
-                    case 1:
-                        if (m_actors[j]->getX() >= ROAD_CENTER - ROAD_WIDTH / 2 + ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3) {
-                            in_lane = true;
-                        }
-                        break;
-                    default:
-                        if (m_actors[j]->getX() >= ROAD_CENTER + ROAD_WIDTH / 2 - ROAD_WIDTH / 3 && m_actors[j]->getX() < ROAD_CENTER + ROAD_WIDTH / 2) {
-                            in_lane = true;
-                        }
-                        break;
-                }
+                bool in_lane = (m_actors[i]->getLane() == cur_lane);
                 if (m_actors[j]->isCollisionAvoidanceWorthy() && in_lane) {
                     if (max_y == VIEW_HEIGHT + 1) {
                         max_y = m_actors[j]->getY();
@@ -216,8 +179,6 @@ int StudentWorld::move()
    
    // add new human pedestrians
    int ChanceHumanPed = max(200 - getLevel() * 10, 30);
-   // CHANGE LATER
-   //int ChanceHumanPed = 10;
    int ChanceHumanPed1 = randInt(0, ChanceHumanPed - 1);
    if (ChanceHumanPed1 == 0) {
        HumanPedestrian* temp = new HumanPedestrian(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT);
@@ -226,8 +187,6 @@ int StudentWorld::move()
    
    // add new zombie pedestrians
    int ChanceZombiePed = max(100 - getLevel() * 10, 20);
-   // CHANGE LATER
-   //int ChanceHumanPed = 10;
    int ChanceZombiePed1 = randInt(0, ChanceZombiePed - 1);
    if (ChanceZombiePed1 == 0) {
        ZombiePedestrian* temp = new ZombiePedestrian(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT);
@@ -258,7 +217,6 @@ int StudentWorld::move()
         m_actors.push_back(temp);
     }
     
-    
    // Update the Game Status display text
    // update the score/lives/level text at screen top
    m_bonus--;
@@ -281,10 +239,15 @@ int StudentWorld::move()
 
 void StudentWorld::cleanUp()
 {
+    // delete all actors
     for (int i = 0; i < m_actors.size(); i++) {
         delete m_actors[i];
     }
+    
+    // make sure m_actors is empty
     m_actors.clear();
+    
+    //delete ghostracer
     if (m_ghost_racer != nullptr) {
         delete m_ghost_racer;
         m_ghost_racer = nullptr;
@@ -336,15 +299,13 @@ bool StudentWorld::overlaps(const Actor* a1, const Actor* a2) const {
     return false;
 }
 
-  // If actor a overlaps this world's GhostRacer, return a pointer to the
-  // GhostRacer; otherwise, return nullptr
-GhostRacer* StudentWorld::getOverlappingGhostRacer(Actor* a) const {
+  // If actor a overlaps this world's GhostRacer, return true, otherwise false
+bool StudentWorld::overlapsGhostRacer(Actor* a) const {
     if (overlaps(a, m_ghost_racer)) {
-        return m_ghost_racer;
+        return true;
     }
-    return nullptr;
+    return false;
 }
-
 
 // returns closest actor in front and in same lane
 bool StudentWorld::hasCloseActorFront(Actor* a) {

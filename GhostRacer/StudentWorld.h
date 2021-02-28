@@ -42,9 +42,8 @@ public:
       // Return true if actor a1 overlaps actor a2, otherwise false.
     bool overlaps(const Actor* a1, const Actor* a2) const;
 
-      // If actor a overlaps this world's GhostRacer, return a pointer to the
-      // GhostRacer; otherwise, return nullptr
-    GhostRacer* getOverlappingGhostRacer(Actor* a) const;
+      // If actor a overlaps this world's GhostRacer, return true, otherwise false.
+    bool overlapsGhostRacer(Actor* a) const;
 private:
     GhostRacer* m_ghost_racer;
     std::vector<Actor*> m_actors;
