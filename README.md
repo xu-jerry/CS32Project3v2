@@ -3,3 +3,6 @@ This was UCLA CS32 Winter 2020's Project 3, where I coded a game in C++ from a p
 
 ## Main Challenges
 When coding this game, one of the most important aspects of computer science I learned was Object-Oriented Programming, specifically how to create different classes that inherited from one another in an organized fashion. In addition, this was the first large-scale project I tackled, spanning several files and many classes.
+
+## Warning
+If you are here to try to copy code, [please don't](https://web.cs.ucla.edu/classes/winter21/cs32/integrity.html). Every quarter, the project spec changes, so my code will not help you.
